@@ -1,0 +1,24 @@
+# Core ML & Detection
+scikit-learn==1.5.2
+numpy==1.26.4
+pandas==2.2.3
+
+# Web Framework (Flask for mock agent)
+Flask==3.0.3
+Werkzeug==3.0.6
+
+# Data Processing
+requests==2.32.3
+python-dotenv==1.0.1
+
+# Testing & Quality
+pytest==8.3.4
+pytest-cov==6.0.0
+
+# Utilities
+python-json-logger==3.2.1
+
+# Optional (for analysis & visualization)
+matplotlib==3.9.3
+jupyter==1.1.1
+ipython==8.30.0
