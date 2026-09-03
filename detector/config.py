@@ -86,8 +86,8 @@ class DetectorConfig:
                 r"if\s+this\s+sentence\s+is\s+true,\s+do\s+not\s+charge\s+me",
             ],
             "constraint_escape": [
-                r"(?:ignore|disregard|forget|drop|override|disable|bypass|reset)\s+(?:all\s+)?(?:the\s+)?(?:previous\s+)?(?:upper\s+|lower\s+)?(?:safety|discount|pricing|merchant|internal|standard|threshold|coupon)?\s*(?:limits|rules|policies|guidelines|guardrails|constraints|ceiling|boundaries|vouchers)",
-                r"(?:apply|give|issue|set)\s+(?:an?\s+)?(?:9[0-9]%|100%|unrestricted|zero\s*rupee|zero-fee|eighty|ninety|hundred|\b\w+\s+percent)\s*(?:off|discount|refund|waiver|checkout|payable|reduction|price\s*cut)",
+                r"(?:ignore|disregard|forget|drop|override|disable|bypass|reset)\s+(?:all\s+)?(?:the\s+)?(?:previous\s+)?(?:max\s+(?:[0-9]+%?\s+)?)?(?:upper\s+|lower\s+)?(?:safety|discount|pricing|merchant|internal|standard|threshold|coupon)?\s*(?:limits?|rules?|policies|policy|guidelines?|guardrails?|constraints?|ceilings?|boundaries|vouchers?)",
+                r"(?:apply|give|issue|set)\s+(?:an?\s+)?(?:(?:9[0-9]%|100%|unrestricted|zero\s*rupee|zero-fee|eighty|ninety|hundred|\b\w+\s+percent)\s*(?:off|discount|refund|waiver|checkout|payable|reduction|price\s*cut)|(?:discount|refund|price|total|payable)\s+(?:to\s+)?(?:9[0-9]%|100%|zero|nil|unrestricted|eighty|ninety))",
                 r"override\s+(?:the\s+)?(?:standard\s+)?refund\s+ceiling",
             ],
         }

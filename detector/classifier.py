@@ -105,25 +105,15 @@ class JailbreakClassifier:
         else:
             final_confidence = ml_score
 
-        # If ML score indicates high probability but no specific category matched yet, deduce category
-        if final_confidence >= 0.50 and attack_type == "none":
-            lower_text = sanitized_text.lower()
-            if any(w in lower_text for w in ["override", "system", "dan", "developer", "cso", "root"]):
-                attack_type = "role_impersonation"
-            elif any(w in lower_text for w in ["discount", "refund", "limit", "rules", "waiver", "zero", "free"]):
-                attack_type = "constraint_escape"
-            elif any(w in lower_text for w in ["bearer", "header", "token", "permission", "tier"]):
-                attack_type = "metadata_manipulation"
-            elif any(w in lower_text for w in ["if", "simulation", "universe", "neither", "paradox"]):
-                attack_type = "logic_confusion"
-            else:
-                attack_type = "constraint_escape"
-
         current_threshold = self.config.current_threshold
         is_jailbreak = final_confidence >= current_threshold
 
-        # If not deemed a jailbreak, clear attack type to 'none'
-        if not is_jailbreak:
+        # Honest categorization:
+        # If deemed a jailbreak but no specific category pattern was matched, label as 'unclassified'
+        if is_jailbreak:
+            if attack_type == "none":
+                attack_type = "unclassified"
+        else:
             attack_type = "none"
 
         return {

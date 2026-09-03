@@ -68,16 +68,9 @@ class InputSanitizer:
                 primary_attack_type = cat
                 break
 
-        if primary_attack_type == "none" and matched_rules:
-            for rule in matched_rules:
-                if any(w in rule for w in ["override", "system", "dan", "developer"]):
-                    primary_attack_type = "role_impersonation"
-                    break
-                elif any(w in rule for w in ["ignore", "disregard", "forget", "99%", "100%", "zero-fee"]):
-                    primary_attack_type = "constraint_escape"
-                    break
-            if primary_attack_type == "none":
-                primary_attack_type = "constraint_escape"
+        # If flagged by blocked keywords alone without matching a category regex, mark as unclassified
+        if primary_attack_type == "none" and is_suspicious:
+            primary_attack_type = "unclassified"
 
         return {
             "sanitized_text": sanitized,

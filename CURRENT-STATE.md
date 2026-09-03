@@ -1,5 +1,5 @@
 # CURRENT_STATE.md
-**Updated:** 2026-08-27 | **Phase:** MVP Implementation Complete | **Progress:** 85%
+**Updated:** 2026-09-03 | **Phase:** Verification & Evaluation Complete | **Progress:** 90%
 
 ---
 
@@ -9,61 +9,67 @@
 |------|--------|---------|
 | Problem | ✅ Done | Agentic Payment Jailbreak Detector (Track 5: Open Track) |
 | Architecture | ✅ Done | Hybrid Rule-Based + TF-IDF Logistic Regression Classifier |
-| Dataset | ✅ Done | 80+ sample training dataset + independent held-out evaluation scenarios |
+| Datasets | ✅ Done | 97 training samples, 21 held-out test scenarios, 10 zero-overlap novel probes |
 | Tests | ✅ Done | 20 unit & integration tests passing (100% pass rate) |
-| Evaluation Notebook | ✅ Done | `notebooks/metrics_analysis.ipynb` with metrics & latency benchmarks |
+| Evaluation Notebook | ✅ Done | `notebooks/metrics_analysis.ipynb` with layer breakdown & latency benchmarks |
 | Pitch Video & Demo | 🟡 In Progress | Script ready; recording next |
 
 ---
 
-## Build Plan & Progress
+## Evaluation Metrics Summary
 
-| Phase | Component | Status | Details |
-|-------|-----------|--------|---------|
-| **1. Setup** | Repo + Folder Layout + README | ✅ Done | Target structure established, Python 3.12 venv configured |
-| **2. Dataset** | Balanced Synthetic Datasets | ✅ Done | 80+ training items + independent held-out evaluation set |
-| **3. Sanitizer** | Obfuscation & Unicode Filter | ✅ Done | Strips zero-width chars (`\u200B`), control chars, normalizes NFKC |
-| **4. Detector** | Hybrid Classifier (Rules + ML) | ✅ Done | Multi-tier thresholds (0.35, 0.60, 0.85), scikit-learn TF-IDF + Logistic Regression |
-| **5. Audit Log** | Explainable JSONL Logger | ✅ Done | PCI-sensitive data redaction (cards/CVV/PINs) + full decision trace |
-| **6. Agent Integration**| Secure Wrapper + Mock Agent | ✅ Done | Strict isolation prevents payment agent execution on attacks |
-| **7. Testing & Metrics**| Pytest Suite & Evaluation | ✅ Done | 20 tests passing; Precision > 90%, Recall > 90%, Latency < 1ms |
-| **8. Documentation** | Context, README, & Decisions | ✅ Done | Up to date with actual code and architecture |
+> [!IMPORTANT]
+> Performance is tracked and reported across two distinct evaluation sets to separate pattern matching from true semantic generalization:
+> 1. **Held-Out Eval Set (Same-Style, N=21):** Independent test scenarios created during design (shares vocabulary and authorship style with training distribution).
+> 2. **Novel-Phrasing Generalization Set (Zero-Overlap, N=10):** Adversarial attacks specifically constructed with **zero lexical overlap** with rule regexes or blocked keywords.
+
+### 1. Held-Out Evaluation Performance (`data/test_scenarios.json`)
+- **Precision:** 100.0% (13 True Positives, 0 False Positives)
+- **Recall:** 100.0% (13/13 Attacks Detected, 0 False Negatives)
+- **F1-Score:** 1.000
+- **Layer Contribution (Balanced Threshold = 0.60):**
+  - **Both Rules & ML Caught:** 6 (`EVAL-CE-003`, `EVAL-PS-002`, `EVAL-RI-002`, `EVAL-RI-003`, `EVAL-MM-002`, `EVAL-LC-002`)
+  - **Rules Alone Decisive:** 4 (`EVAL-PS-001`, `EVAL-PS-003`, `EVAL-MM-001`, `EVAL-LC-001`)
+  - **ML Alone Decisive:** 3 (`EVAL-CE-001`, `EVAL-CE-002`, `EVAL-RI-001`)
+  - **Neither Fired (True Negatives):** 8 (all 8 legitimate queries allowed, including `EVAL-LEGIT-008` verified admin)
+
+### 2. Novel-Phrasing Generalization Performance (`data/novel_generalization_test.json`)
+- **Rule Coverage:** 0.0% (0/10 caught — verifies zero rule overlap)
+- **ML Recall at Balanced (0.60):** 20.0% (2/10 caught)
+- **ML Recall at Conservative (0.35):** 100.0% (10/10 caught)
+- **ML Recall at Lenient (0.85):** 0.0% (0/10 caught)
+
+### 3. Risk Profile Comparison Across Both Sets
+
+| Risk Profile | Threshold | Precision (Held-Out) | Recall (Held-Out) | Recall (Novel Probes) | F1-Score | False Positives |
+|---|---|---|---|---|---|---|
+| **Conservative** | 0.35 | 86.7% | 100.0% | 100.0% | 0.929 | 2 |
+| **Balanced** | 0.60 | 100.0% | 100.0% | 20.0% | 1.000 | 0 |
+| **Lenient** | 0.85 | 100.0% | 76.9% | 0.0% | 0.870 | 0 |
+
+### 4. Real-Time Latency Benchmark (100 Iterations)
+- **Mean Latency:** 0.77 ms
+- **P95 Latency:** 1.36 ms
+- **Target SLA:** < 100 ms (Passed with 99%+ margin)
 
 ---
 
-## Current Test Results
+## Build Plan & Component Status
 
-```
-tests/test_jailbreaks.py:
-  - test_attack_category_constraint_escape              PASSED
-  - test_attack_category_prompt_smuggling               PASSED
-  - test_attack_category_role_impersonation             PASSED
-  - test_attack_category_metadata_manipulation_prompt   PASSED
-  - test_attack_category_unverified_metadata_role       PASSED
-  - test_attack_category_logic_confusion                PASSED
-  - test_paraphrased_jailbreak_detection                PASSED
-  - test_legitimate_payment_status                      PASSED
-  - test_legitimate_coupon_inquiry                      PASSED
-  - test_legitimate_duplicate_charge_refund             PASSED
-  - test_legitimate_verified_admin_role                 PASSED
-  - test_sanitizer_removes_zero_width_and_control_chars PASSED
-  - test_obfuscated_prompt_still_detected               PASSED
-  - test_risk_profiles_different_thresholds             PASSED
-  - test_secure_wrapper_blocks_prompt_smuggled_in_notes PASSED
-  - test_secure_wrapper_guarantees_agent_not_called     PASSED
-  - test_secure_wrapper_allows_legitimate_request       PASSED
-  - test_audit_logger_redacts_card_numbers              PASSED
-
-tests/test_metrics.py:
-  - test_held_out_evaluation_metrics                    PASSED
-  - test_risk_profiles_tradeoffs_on_evaluation_dataset  PASSED
-
-Result: 20 passed in 3.60s
-```
+| Phase | Component | Status | Details |
+|-------|-----------|--------|---------|
+| **1. Setup** | Repo + Folder Layout + README | ✅ Done | Layout established, Python 3.12 venv configured |
+| **2. Datasets** | Training, Eval & Novel Probe Datasets | ✅ Done | 97 training + 21 held-out eval + 10 novel zero-overlap probes |
+| **3. Sanitizer** | Obfuscation & Unicode Filter | ✅ Done | Strips zero-width chars (`\u200B`), control chars, normalizes NFKC |
+| **4. Detector** | Hybrid Classifier (Rules + ML) | ✅ Done | Multi-tier thresholds (0.35, 0.60, 0.85), scikit-learn TF-IDF + Logistic Regression |
+| **5. Categorization**| Honest Category Attribution | ✅ Done | Removed keyword-sniffing fallback; uses explicit `unclassified` when ML flags novel attacks |
+| **6. Audit Log** | Explainable JSONL Logger | ✅ Done | PCI-sensitive data redaction (cards/CVV/PINs) + full decision trace |
+| **7. Agent Wrapper**| Secure Wrapper + Mock Agent | ✅ Done | Strict isolation prevents payment agent execution on attacks |
+| **8. Testing & Metrics**| Pytest Suite & Evaluation Notebook | ✅ Done | 20 tests passing; notebook runs clean top-to-bottom |
 
 ---
 
 ## Next Steps
 
-1. Record the 5-minute pitch video following the structure in `PROJECT_CONTEXT.md`.
-2. Package repo and submission form for Razorpay Buildathon Track 5.
+1. Record the 5-minute pitch video highlighting the hybrid security architecture, honest generalization trade-offs, and sub-millisecond execution.
+2. Finalize submission link for Razorpay Buildathon Track 5.
