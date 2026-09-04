@@ -50,3 +50,4 @@ audit_logs/
 .idea/
 .DS_Store
 Thumbs.db
+"audit_logs.jsonl" 

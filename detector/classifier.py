@@ -108,6 +108,21 @@ class JailbreakClassifier:
         current_threshold = self.config.current_threshold
         is_jailbreak = final_confidence >= current_threshold
 
+        # Report which layer actually determined the decision (rule engine, ML, both, or neither)
+        rule_fired = rule_score > 0
+        ml_fired = ml_score > 0
+        if is_jailbreak:
+            if rule_fired and ml_fired:
+                triggered_by = "rule+ml"
+            elif rule_fired:
+                triggered_by = "rule"
+            elif ml_fired:
+                triggered_by = "ml"
+            else:
+                triggered_by = "unknown"
+        else:
+            triggered_by = "none"
+
         # Honest categorization:
         # If deemed a jailbreak but no specific category pattern was matched, label as 'unclassified'
         if is_jailbreak:
@@ -126,4 +141,7 @@ class JailbreakClassifier:
             "risk_level": self.config.risk_level,
             "sanitized_input": sanitized_text,
             "matched_rules": heuristic_res["matched_rules"],
+            "triggered_by": triggered_by,
+            "rule_fired": rule_fired,
+            "ml_fired": ml_fired,
         }
