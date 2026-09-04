@@ -10,7 +10,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+/lib/
 lib64/
 parts/
 sdist/
@@ -51,3 +51,4 @@ audit_logs/
 .DS_Store
 Thumbs.db
 "audit_logs.jsonl" 
+audit_logs.jsonl

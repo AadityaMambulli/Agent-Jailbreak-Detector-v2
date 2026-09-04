@@ -221,6 +221,7 @@ function LiveSandboxPage() {
   const [stats, setStats] = useState({
     total: 0,
     blocked: 0,
+    pending: 0,
     safe: 0,
     latencies: [] as number[],
   })
@@ -271,11 +272,13 @@ function LiveSandboxPage() {
 
       setStats((prev) => {
         const isBlocked = res.status === "blocked"
+        const isPending = res.status === "pending_review"
         const nextLat = [...prev.latencies, parseFloat(duration)]
         return {
           total: prev.total + 1,
           blocked: prev.blocked + (isBlocked ? 1 : 0),
-          safe: prev.safe + (isBlocked ? 0 : 1),
+          pending: prev.pending + (isPending ? 1 : 0),
+          safe: prev.safe + (!isBlocked && !isPending ? 1 : 0),
           latencies: nextLat,
         }
       })
@@ -360,6 +363,7 @@ function LiveSandboxPage() {
             <QuickStats
               total={stats.total}
               blocked={stats.blocked}
+              pending={stats.pending}
               safe={stats.safe}
               avgLatency={avgLatency}
             />

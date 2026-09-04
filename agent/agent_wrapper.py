@@ -45,7 +45,10 @@ class SecurePaymentAgentWrapper:
         detection = self.classifier.classify(combined_text, metadata=metadata)
 
         # Step 3: Policy Enforcement
-        if detection["is_jailbreak"]:
+        status = detection.get("status", "allow")
+
+        # Step 3a: Block high-confidence threats
+        if status == "block":
             action_taken = "blocked"
             self.logger.log_decision(
                 input_text=message or combined_text,
@@ -63,7 +66,25 @@ class SecurePaymentAgentWrapper:
                 "threshold_applied": detection["threshold_applied"],
             }
 
-        # Step 4: Safe execution via Payment Agent
+        # Step 3b: Pending review for medium-confidence detections
+        elif status == "pending_review":
+            action_taken = "pending_review"
+            self.logger.log_decision(
+                input_text=message or combined_text,
+                classification_result=detection,
+                action_taken=action_taken,
+                metadata=metadata,
+            )
+            return {
+                "status": "pending_review",
+                "reason": "Advisory: Confidence within review band. Awaiting manual approval.",
+                "attack_type": detection["attack_type"],
+                "confidence": detection["confidence"],
+                "risk_level": detection["risk_level"],
+                "threshold_applied": detection["threshold_applied"],
+            }
+
+        # Step 3c: Safe execution via Payment Agent
         action_taken = "allowed"
         self.logger.log_decision(
             input_text=message or combined_text,

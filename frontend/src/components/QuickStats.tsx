@@ -4,6 +4,7 @@ import { BarChart3 } from "lucide-react"
 interface Props {
   total: number
   blocked: number
+  pending: number
   safe: number
   avgLatency: string
 }
@@ -11,6 +12,7 @@ interface Props {
 export const QuickStats: React.FC<Props> = ({
   total,
   blocked,
+  pending,
   safe,
   avgLatency,
 }) => {
@@ -43,6 +45,13 @@ export const QuickStats: React.FC<Props> = ({
             <span className="text-rose-300">Threats Blocked</span>
             <span className="font-mono text-sm font-semibold text-rose-400">
               {blocked}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-amber-950/20 border border-amber-500/20">
+            <span className="text-amber-300">Pending Review</span>
+            <span className="font-mono text-sm font-semibold text-amber-400">
+              {pending}
             </span>
           </div>
 

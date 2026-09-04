@@ -96,3 +96,8 @@ class DetectorConfig:
     @property
     def current_threshold(self) -> float:
         return self.thresholds.get(self.risk_level, 0.60)
+
+    @property
+    def pending_threshold(self) -> float:
+        """Lower bound of the pending-review band (half the block threshold)."""
+        return self.current_threshold * 0.5

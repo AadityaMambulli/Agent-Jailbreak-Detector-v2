@@ -38,7 +38,7 @@ class AuditLogger:
         entry = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "input": self._redact_sensitive_data(input_text),
-            "classification": "jailbreak" if classification_result.get("is_jailbreak") else "legitimate",
+            "classification": classification_result.get("status", "unknown"),
             "confidence": classification_result.get("confidence", 0.0),
             "ml_score": classification_result.get("ml_score", 0.0),
             "rule_score": classification_result.get("rule_score", 0.0),

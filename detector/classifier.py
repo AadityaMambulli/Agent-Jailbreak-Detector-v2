@@ -106,12 +106,23 @@ class JailbreakClassifier:
             final_confidence = ml_score
 
         current_threshold = self.config.current_threshold
-        is_jailbreak = final_confidence >= current_threshold
+        pending_threshold = self.config.pending_threshold
+
+        # Three-tier decision
+        if final_confidence >= current_threshold:
+            status = "block"
+            is_jailbreak = True
+        elif final_confidence >= pending_threshold:
+            status = "pending_review"
+            is_jailbreak = False
+        else:
+            status = "allow"
+            is_jailbreak = False
 
         # Report which layer actually determined the decision (rule engine, ML, both, or neither)
         rule_fired = rule_score > 0
         ml_fired = ml_score > 0
-        if is_jailbreak:
+        if status in ("block", "pending_review"):
             if rule_fired and ml_fired:
                 triggered_by = "rule+ml"
             elif rule_fired:
@@ -124,14 +135,15 @@ class JailbreakClassifier:
             triggered_by = "none"
 
         # Honest categorization:
-        # If deemed a jailbreak but no specific category pattern was matched, label as 'unclassified'
-        if is_jailbreak:
+        # If deemed a jailbreak or pending_review but no specific category pattern was matched, label as 'unclassified'
+        if status in ("block", "pending_review"):
             if attack_type == "none":
                 attack_type = "unclassified"
         else:
             attack_type = "none"
 
         return {
+            "status": status,
             "is_jailbreak": is_jailbreak,
             "confidence": round(final_confidence, 4),
             "ml_score": round(ml_score, 4),
