@@ -44,11 +44,15 @@ htmlcov/
 *.log
 logs/
 audit_logs/
+audit_logs.jsonl
 
 # IDE & OS
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
-"audit_logs.jsonl" 
-audit_logs.jsonl
+
+# Agentic / Scratch Docs
+.claude/
+DESIGN-claude.md
+frontend-visual-refinement-prompt.md

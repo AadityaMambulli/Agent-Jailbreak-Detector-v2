@@ -18,61 +18,35 @@ The system operates as an inline security boundary between untrusted user inputs
 │  1. Input Sanitization & Unicode Normalization│
 │  2. Deterministic Rule & Regex Patterns      │
 │  3. TF-IDF Feature Extraction & ML Inference  │
-│  4. Combined Scoring & Threshold Evaluation   │
-│  5. Explainable JSONL Audit Logging          │
+│  4. Three-Tier Score & Threshold Evaluation  │
+│  5. PCI-DSS Masked JSONL Audit Logging       │
 └──────────────────────────────────────────────┘
           │
-     ┌────┴────────────┐
-     ▼                 ▼
-[BLOCKED]          [ALLOWED]
-(403 Security)         │
-                       ▼
-            ┌─────────────────────┐
-            │  MockPaymentAgent   │
-            │  (Business Guardrails│
-            │   & Execution)      │
-            └─────────────────────┘
+     ┌────┼────────────────────────┐
+     ▼    ▼                        ▼
+[BLOCKED] [PENDING REVIEW]     [ALLOWED]
+(403 Stop) (Human Advisory)         │
+                                   ▼
+                        ┌─────────────────────┐
+                        │  MockPaymentAgent   │
+                        │  (Business Guardrails│
+                        │   & Execution)      │
+                        └─────────────────────┘
 ```
 
 ---
 
-## Project Structure
+## Three-Tier Policy Enforcement System
 
-```
-razorpay-agentic-jailbreak-detector/
-│
-├── README.md                          # Project documentation and architecture guide
-├── PROJECT_CONTEXT.md                 # Background, venue, and design requirements
-├── CURRENT_STATE.md                   # Live development status and milestone tracking
-├── DECISIONS.md                       # Architectural decision records
-├── requirements.txt                   # Project dependencies
-├── .gitignore
-│
-├── data/
-│   ├── jailbreak_examples.json        # Training dataset (97 balanced examples)
-│   ├── test_scenarios.json            # Held-out evaluation scenarios (unseen during training)
-│   └── novel_generalization_test.json # Zero-lexical-overlap adversarial generalization probes
-│
-├── detector/
-│   ├── __init__.py
-│   ├── config.py                      # Risk profiles, thresholds, and attack patterns
-│   ├── sanitizer.py                   # Unicode normalization, zero-width stripping, heuristics
-│   ├── classifier.py                  # Hybrid rule + TF-IDF Logistic Regression classifier
-│   └── audit_logger.py                # Redacting JSONL audit trail logger
-│
-├── agent/
-│   ├── __init__.py
-│   ├── payment_agent.py               # Mock payment agent with business limit enforcement
-│   └── agent_wrapper.py               # Secure gateway wrapping payment agent execution
-│
-├── tests/
-│   ├── __init__.py
-│   ├── test_jailbreaks.py             # 18 unit tests across categories, profiles, obfuscation
-│   └── test_metrics.py                # Evaluation metrics, confusion matrix, and trade-offs
-│
-└── notebooks/
-    └── metrics_analysis.ipynb         # Full evaluation notebook with charts & latency benchmarks
-```
+Rather than a brittle binary allow/block toggle, Agentic Shield employs a calibrated **Three-Tier Policy Boundary** with human-in-the-loop oversight:
+
+$$\text{pending\_threshold} = \text{current\_threshold} \times 0.5$$
+
+| Decision Tier | Confidence Range (`balanced`) | Enforcement Action | Operational Flow |
+| :--- | :--- | :--- | :--- |
+| **`allow`** | `< 0.30` (< 30%) | **Auto-Approved** | Forwarded directly to `MockPaymentAgent` for execution. |
+| **`pending_review`** | `0.30 — 0.59` (30%–59%) | **Advisory Hold** | Input quarantined; held for human review or merchant 2FA step-up. |
+| **`block`** | `≥ 0.60` (≥ 60%) | **Hard Suppression** | Intercepted with 0 downstream tool invocations; security violation logged. |
 
 ---
 
@@ -90,9 +64,9 @@ razorpay-agentic-jailbreak-detector/
 ## Risk Profiles & Thresholds
 
 Merchants configure risk tolerance via `DetectorConfig`:
-- **Conservative (`threshold = 0.35`)**: Maximum fraud prevention, prioritizes high Recall (100.0% on held-out and novel probes), blocks borderline suspicious requests.
-- **Balanced (`threshold = 0.60`)**: Default production setting balancing high Recall (100.0% held-out) with zero false positives.
-- **Lenient (`threshold = 0.85`)**: Minimizes customer checkout friction, requiring high confidence (100.0% precision) before blocking.
+- **Conservative (`block ≥ 0.35`, `review ≥ 0.175`)**: Maximum fraud prevention, prioritizes high Recall (100.0% on held-out and novel probes), quarantines borderline requests.
+- **Balanced (`block ≥ 0.60`, `review ≥ 0.30`)**: Default production setting balancing high Recall with zero false positives.
+- **Lenient (`block ≥ 0.85`, `review ≥ 0.425`)**: Minimizes customer checkout friction, requiring high confidence before taking blocking action.
 
 ---
 

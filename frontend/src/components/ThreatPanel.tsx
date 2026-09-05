@@ -20,7 +20,7 @@ export const ThreatPanel: React.FC<Props> = ({
 
   return (
     <div
-      className={`rounded-2xl border bg-white/[0.03] backdrop-blur-xl p-6 shadow-2xl transition-all duration-500 flex flex-col justify-between ${
+      className={`relative rounded-2xl border bg-white/[0.03] backdrop-blur-xl p-6 shadow-2xl transition-all duration-500 flex flex-col justify-between ${
         isBlocked
           ? "border-rose-500/40 shadow-rose-950/30"
           : isPending
@@ -30,12 +30,18 @@ export const ThreatPanel: React.FC<Props> = ({
               : "border-white/10"
       }`}
     >
+      {/* Viewfinder corner-bracket accents */}
+      <span className="absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 border-red-500 pointer-events-none rounded-tl-sm z-20" />
+      <span className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-red-500 pointer-events-none rounded-tr-sm z-20" />
+      <span className="absolute bottom-0 left-0 w-3.5 h-3.5 border-b-2 border-l-2 border-red-500 pointer-events-none rounded-bl-sm z-20" />
+      <span className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 border-red-500 pointer-events-none rounded-br-sm z-20" />
+
       <div>
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2.5">
             <div
-              className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
+              className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors shrink-0 ${
                 isBlocked
                   ? "bg-rose-500/10 border-rose-500/30 text-rose-400"
                   : isPending
@@ -48,6 +54,9 @@ export const ThreatPanel: React.FC<Props> = ({
               <Radar className="w-4 h-4" />
             </div>
             <div>
+              <div className="font-mono text-[10px] font-bold tracking-widest text-red-400 uppercase mb-0.5">
+                02 // THREAT ANALYSIS
+              </div>
               <h3 className="text-sm font-semibold text-white tracking-tight">
                 Threat Analysis
               </h3>

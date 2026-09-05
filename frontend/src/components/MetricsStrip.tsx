@@ -16,7 +16,7 @@ export const MetricsStrip: React.FC<Props> = ({ metrics, sessionAvgLatency }) =>
       {/* Latency card */}
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 hover:border-red-500/40 transition-all group">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <span className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-400">
             Latency
           </span>
           <Gauge className="w-4 h-4 text-slate-500 group-hover:text-red-400 transition-colors" />
@@ -33,7 +33,7 @@ export const MetricsStrip: React.FC<Props> = ({ metrics, sessionAvgLatency }) =>
       {/* Precision card */}
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 hover:border-red-500/40 transition-all group">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <span className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-400">
             Precision
           </span>
           <Target className="w-4 h-4 text-slate-500 group-hover:text-red-400 transition-colors" />
@@ -49,7 +49,7 @@ export const MetricsStrip: React.FC<Props> = ({ metrics, sessionAvgLatency }) =>
       {/* F1 Score card */}
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 hover:border-red-500/40 transition-all group">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <span className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-400">
             F1 Score
           </span>
           <Activity className="w-4 h-4 text-slate-500 group-hover:text-red-400 transition-colors" />
@@ -63,7 +63,7 @@ export const MetricsStrip: React.FC<Props> = ({ metrics, sessionAvgLatency }) =>
       {/* Compliance card */}
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 hover:border-red-500/40 transition-all group">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <span className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-400">
             Compliance
           </span>
           <Lock className="w-4 h-4 text-slate-500 group-hover:text-red-400 transition-colors" />

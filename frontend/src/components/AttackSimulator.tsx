@@ -44,10 +44,13 @@ export const AttackSimulator: React.FC<Props> = ({
         {/* Card Header */}
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
+            <div className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 shrink-0">
               <Terminal className="w-4 h-4" />
             </div>
             <div>
+              <div className="font-mono text-[10px] font-bold tracking-widest text-red-400 uppercase mb-0.5">
+                01 // ATTACK SIMULATION
+              </div>
               <h3 className="text-sm font-semibold text-white tracking-tight">
                 Attack Simulator & Testbench
               </h3>
